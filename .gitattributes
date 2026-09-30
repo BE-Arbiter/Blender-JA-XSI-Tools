@@ -1,0 +1,2 @@
+# dotXSI files are CRLF text written by 3ds Max; keep the test fixtures byte-identical
+*.xsi -text

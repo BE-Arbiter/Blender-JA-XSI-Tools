@@ -1,0 +1,11 @@
+{
+    "include": ["."],
+    "exclude": [
+        "build",
+        "**/__pycache__",
+        ".venv",
+        ".proprietary"
+    ],
+    "typeCheckingMode": "standard",
+    "pythonVersion": "3.11"
+}

@@ -1,0 +1,177 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+
+%opening
+\title{Blender JA dotXSI Tools Manual}
+\author{BE-Arbiter}
+
+\begin{document}
+
+ \maketitle
+
+ \newpage
+
+ \tableofcontents
+
+ \newpage
+
+ \section{Purpose of this document}
+
+ This manual explains the Blender add-on importing and exporting Softimage dotXSI 3.0 skeletal
+ animations (\texttt{.xsi}) as NLA strips, for Jedi Academy animation work. It is meant to be used
+ together with the Blender Jedi Academy Plugin Suite (the \texttt{jediacademy} add-on), which reads and
+ writes the game's \texttt{.gla} and \texttt{animation.cfg} files. It does not explain how to use
+ Blender itself.
+
+ dotXSI 3.0 is the text format written by 3ds Max's dotXSI exporter, which Raven's tools (Carcass)
+ compile into \texttt{.gla} animations. Many community animations for Jedi Academy are distributed in
+ it, typically made with Ashuradx's CAT rig of the \texttt{\_humanoid} skeleton.
+
+ \section{Changelog}
+
+ \subsection*{next version}
+ Initial release:
+ \begin{itemize}
+  \item dotXSI 3.0 import as NLA strips, onto the existing \texttt{skeleton\_root} or a new armature
+  \item Several sequence names separated by dots create stacked strips, one action per name
+  \item Export of the selected NLA strips as dotXSI 3.0, concatenated end to end
+ \end{itemize}
+
+ \section{Installation}
+
+ Download \texttt{io\_scene\_dotXsi3.zip} from the releases page and install it with the
+ ``Install from Disk'' button in Blender's add-on preferences, then enable
+ ``JA dotXSI NLA Import/Export (.xsi)''. Blender 4.1 or newer is required.
+
+ The add-on adds two menu entries:
+ \begin{itemize}
+  \item File $\rightarrow$ Import $\rightarrow$ JA dotXSI NLA Import (.xsi)
+  \item File $\rightarrow$ Export $\rightarrow$ JA dotXSI NLA Export (.xsi)
+ \end{itemize}
+
+ \section{The dotXSI 3.0 files}
+
+ Only the text flavour of dotXSI 3.x (header \texttt{xsi 0300txt 0032}) is supported. The older 1.x
+ files (header \texttt{xsi 0101txt}, e.g. Battlezone II models) are a different, DirectX-like format
+ and are rejected with an error, as are binary files.
+
+ Only the skeleton and its animation are read: every \texttt{SI\_Model} becomes a bone, whatever its
+ content (\texttt{SI\_Null}, mesh, \ldots). Meshes, materials, cameras and lights are ignored.
+
+ \subsection{Conventions}
+
+ These were verified against Raven's \texttt{\_humanoid.gla}, compiled by Carcass from the same kind
+ of files:
+ \begin{itemize}
+  \item \texttt{SI\_Transform SRT-} values are local to the parent model, \texttt{BASEPOSE-} values are
+  in world space. The base pose is used as the rest pose.
+  \item Rotations are Euler XYZ in degrees; a local matrix is translation $\times$ rotation $\times$
+  scale.
+  \item \texttt{SI\_FCurve}s hold the local scaling, rotation and translation per frame. Tangents of
+  \texttt{HERMITE}/\texttt{CUBIC} curves are ignored, keys are interpolated linearly.
+  \item The files are Y-up, Ghoul 2 and Blender are Z-up: $(x, y, z) \rightarrow (x, -z, y)$.
+  \item \texttt{\_humanoid} is scaled by 0.64. With this scale and axis conversion, the file's base
+  pose matches the \texttt{.gla}'s base pose, bone axes included (Ghoul 2 bones point along X).
+  \item Carcass moves the whole skeleton by the model's origin: every frame of \texttt{\_humanoid.gla}
+  has \texttt{model\_root} at $(0, 0, -24)$ --- the player origin is 24 units above the feet --- while
+  its base pose stays at 0. The dotXSI files do not contain this offset.
+  \item Carcass reads an \texttt{\_always\_} name suffix as a flag and drops it: the file's
+  \texttt{face\_always\_} is the \texttt{.gla}'s \texttt{face} bone.
+  \item Bone scale is not supported by Ghoul 2 and is ignored. (The CAT rig's face bones are scaled
+  by 1.087.)
+ \end{itemize}
+
+ \section{Import}
+
+ \subsection{Target armature}
+
+ The animation is applied to the armature named \texttt{skeleton\_root} (the name the
+ \texttt{jediacademy} add-on uses), or else to the active armature, matching bones by name. If there
+ is none, a \texttt{skeleton\_root} is created from the file's base pose and a warning is shown. The
+ import dialog shows which armature will be used.
+
+ The animation is transferred as world-space offsets from the file's base pose, applied on top of
+ each bone's own rest pose. So it also works on an armature whose rest orientations differ, such as
+ one imported by the \texttt{jediacademy} add-on with its \texttt{\_humanoid} skeleton changes.
+
+ \subsection{Settings}
+
+ \begin{description}
+  \item[Bones] Only when a new armature is created: \emph{JKA \_humanoid} creates the 53 bones of
+  \texttt{\_humanoid.gla} with its hierarchy (a bone missing from the file is replaced by its nearest
+  present ancestor), \emph{All but helpers} every model except effectors, \texttt{skeleton\_root} and
+  \texttt{mesh\_root}, \emph{All} every model with the file's hierarchy.
+  \item[Scale] Scale applied to the file, 0.64 for \texttt{\_humanoid}.
+  \item[Origin Offset] Translation added to the whole skeleton in every frame, in Ghoul 2 units,
+  $(0, 0, -24)$ by default to match the stock animations.
+  \item[Y Up to Z Up] Axis conversion, on by default.
+  \item[Add as NLA Strip] Puts the animation in a new NLA strip rather than making it the active
+  action. On by default.
+  \item[Strip Start] First frame of the strip. $-1$ places it right after the last existing strip.
+  \item[Sequence Name] Name of the action and of the \texttt{animation.cfg} sequence. Empty uses the
+  file name. Several names separated by dots, e.g.
+  \texttt{BOTH\_SABERFAST\_STANCE.BOTH\_STAND2.BOTH\_SABERSLOW\_STANCE}, create one action per name,
+  with their strips stacked at the same frames on successive tracks.
+  \item[Loop Frame] \texttt{animation.cfg} loop frame: $-1$ for no loop, 0 to loop from the start.
+  \item[Start at Frame 0] Without NLA strip only: shifts the action so it starts at frame 0.
+  \item[Set Scene Range \& FPS] Extends the scene's frame range to the new strips --- the
+  \texttt{.gla} export samples the scene range --- and uses the file's frame rate when the strips are
+  the only ones.
+ \end{description}
+
+ Strips are laid out like the \texttt{jediacademy} add-on's \texttt{.gla} import with an
+ \texttt{animation.cfg}: one action per sequence (with a fake user), strips on
+ ``Sequences Layer $n$'' tracks, no extrapolation, replace blending, and the sequence's loop frame,
+ frame rate and length stored in the action's Ghoul 2 sequence properties when the
+ \texttt{jediacademy} add-on is enabled. Only the new strips are left selected, ready to be exported.
+
+ If another track is soloed, the new strips are not visible in the viewport until it is un-soloed;
+ the \texttt{jediacademy} exports are not affected.
+
+ \section{Export}
+
+ Writes the armature's selected NLA strips as a dotXSI 3.0 file, in the layout of 3ds Max's
+ exporter. Only the armature is exported.
+
+ \begin{itemize}
+  \item Armature: the active armature, else \texttt{skeleton\_root}, else the first armature of the
+  scene.
+  \item Strips: the selected strips of that armature, in timeline order. Several strips are
+  concatenated end to end, and a warning says so. With no strip selected, only the skeleton (its rest
+  pose, without animation) is exported, with a warning.
+  \item A strip's length is the sequence length recorded by the \texttt{jediacademy} add-on (so a
+  1-frame still exports 1 frame), else the length of the action range used by the strip.
+  \item \texttt{face} is written as \texttt{face\_always\_}.
+ \end{itemize}
+
+ The export dialog lists the armature and the strips that will be exported. Its settings (scale,
+ origin offset, axis conversion) are the inverse of the import's.
+
+ The export reads the actions' keyframes directly: constraints, drivers, and a strip's repeat or
+ scale are not taken into account.
+
+ \section{Workflow with the Jedi Academy plugin suite}
+
+ \begin{enumerate}
+  \item Import \texttt{models/players/\_humanoid/\_humanoid.gla} with the \texttt{jediacademy}
+  add-on, with ``animations: Cfg'' to get every stock sequence as NLA strips, or without animations
+  to only get the skeleton.
+  \item Import the \texttt{.xsi} file. Give the sequence name(s) it should have in
+  \texttt{animation.cfg}.
+  \item Export the \texttt{.gla} with the \texttt{jediacademy} add-on, with
+  \texttt{models/players/\_humanoid/\_humanoid} as ``gla reference'' so the bone indices match the
+  game's models, and the \texttt{animation.cfg} from the NLA strips.
+ \end{enumerate}
+
+ To edit a stock animation in another tool, select its strip and export it as dotXSI.
+
+ \subsection*{Saber stances}
+
+ For reference, the stances of the single saber styles in \texttt{animation.cfg} are
+ \texttt{BOTH\_SABERFAST\_STANCE} (fast), \texttt{BOTH\_STAND2} (medium, with its random idles
+ \texttt{BOTH\_STAND2IDLE1} and \texttt{BOTH\_STAND2IDLE2}) and \texttt{BOTH\_SABERSLOW\_STANCE}
+ (strong). Dual and staff use \texttt{BOTH\_SABERDUAL\_STANCE} and \texttt{BOTH\_SABERSTAFF\_STANCE}.
+
+\end{document}
