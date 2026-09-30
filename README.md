@@ -11,7 +11,7 @@ distributed in it.
 
 ## Installation
 
-Download `io_scene_dotXsi3.zip` from the [releases](https://github.com/BE-Arbiter/Blender-JA-XSI-Tools/releases),
+Download `Blender_JA_dotXSI_Tools.zip` from the [releases](https://github.com/BE-Arbiter/Blender-JA-XSI-Tools/releases),
 install it with "Install from Disk" in Blender's add-on preferences and enable
 "JA dotXSI NLA Import/Export (.xsi)". Blender 4.1 or newer.
 
@@ -33,7 +33,7 @@ settings and the file format conventions.
 
 ## Development
 
-- `make` builds `build/io_scene_dotXsi3.zip` and the manual (needs `zip` and `pdflatex`).
+- `make` builds `build/Blender_JA_dotXSI_Tools.zip` and the manual (needs `zip` and `pdflatex`).
 - `make pep8` / `make format` check / fix the code style.
 - Tests run headless in Blender:
   `blender --background --factory-startup --python-exit-code 1 --python tests/run_tests.py`

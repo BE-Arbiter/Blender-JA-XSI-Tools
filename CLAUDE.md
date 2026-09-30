@@ -10,12 +10,12 @@ is meant to be used with the Blender Jedi Academy Plugin Suite (`jediacademy` ad
 `../Blender-Jedi-Academy-Tools`), which owns `.gla`/`animation.cfg` I/O; this add-on only mirrors its
 scene conventions (armature `skeleton_root`, NLA layout, `action.g2_sequence_prop`), it never imports it.
 
-The installed module name is `io_scene_dotXsi3` (folder name inside the release zip), kept for
-compatibility with installs predating this repo.
+The installed module name is `Blender_JA_dotXSI_Tools`: the folder name inside the release zip
+`Blender_JA_dotXSI_Tools.zip` (`PACKAGE` in the Makefile, `PACKAGE` in `tests/testutil.py`).
 
 ## Commands
 
-- `make` — builds `build/io_scene_dotXsi3.zip` (installable add-on) and `build/ja_xsi_tools_doc.pdf`.
+- `make` — builds `build/Blender_JA_dotXSI_Tools.zip` (installable add-on) and `build/ja_xsi_tools_doc.pdf`.
 - `make pep8` / `make format` — pycodestyle check (what CI runs) / autopep8 fix, config in `.pep8`.
 - Tests: `.claude/skills/blender-tests/run_blender_tests.sh 4.1 5.2` (podman), or a local Blender:
   `blender --background --factory-startup --python-exit-code 1 --python tests/run_tests.py`.

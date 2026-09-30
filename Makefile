@@ -1,8 +1,7 @@
 PY_FILES = __init__.py dotxsi.py xsi3_blender_importer.py xsi3_blender_exporter.py
 
-# Folder name inside the zip = the add-on's module name in Blender. Kept as io_scene_dotXsi3 so an
-# installed copy's preferences (enabled state) carry over.
-PACKAGE = io_scene_dotXsi3
+# Folder name inside the zip = the add-on's module name in Blender (Install from Disk keeps it).
+PACKAGE = Blender_JA_dotXSI_Tools
 
 DOC = ja_xsi_tools_doc
 

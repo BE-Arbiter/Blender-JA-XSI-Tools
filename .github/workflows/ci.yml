@@ -111,7 +111,7 @@ jobs:
           working_directory: build
           root_file: ../ja_xsi_tools_doc.tex
       - name: Package plugin
-        run: make build/io_scene_dotXsi3.zip
+        run: make build/Blender_JA_dotXSI_Tools.zip
       - name: Extract latest commit message
         id: notes
         run: |
@@ -150,12 +150,12 @@ jobs:
 
             ${{ steps.notes.outputs.body }}
 
-            Install io_scene_dotXsi3.zip with the "Install from Disk" button in Blender's add-on preferences.
+            Install Blender_JA_dotXSI_Tools.zip with the "Install from Disk" button in Blender's add-on preferences.
 
             Please consult ja_xsi_tools_doc.pdf for instructions on how to use the add-on.
           files: |
             build/ja_xsi_tools_doc.pdf
-            build/io_scene_dotXsi3.zip
+            build/Blender_JA_dotXSI_Tools.zip
 
   release:
     # Only for vX.Y.Z tag pushes, once smoke-test/typecheck/pep8 passed.
@@ -181,7 +181,7 @@ jobs:
           working_directory: build
           root_file: ../ja_xsi_tools_doc.tex
       - name: Package plugin
-        run: make build/io_scene_dotXsi3.zip
+        run: make build/Blender_JA_dotXSI_Tools.zip
 
       - name: Extract release notes from tagged commit
         id: notes
@@ -199,9 +199,9 @@ jobs:
           body: |
             ${{ steps.notes.outputs.body }}
 
-            Install io_scene_dotXsi3.zip with the "Install from Disk" button in Blender's add-on preferences.
+            Install Blender_JA_dotXSI_Tools.zip with the "Install from Disk" button in Blender's add-on preferences.
 
             Please consult ja_xsi_tools_doc.pdf for instructions on how to use the add-on.
           files: |
             build/ja_xsi_tools_doc.pdf
-            build/io_scene_dotXsi3.zip
+            build/Blender_JA_dotXSI_Tools.zip

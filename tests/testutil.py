@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple
 if TYPE_CHECKING:
     import mathutils
 
-PACKAGE = "io_scene_dotXsi3"
+PACKAGE = "Blender_JA_dotXSI_Tools"
 
 
 def import_addon() -> ModuleType:
